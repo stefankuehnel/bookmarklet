@@ -1,0 +1,143 @@
+.PopoverArrow {
+  fill: var(--color-white);
+}
+
+.PopoverClose {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  position: absolute;
+  top: calc(var(--spacing) * 2);
+  right: calc(var(--spacing) * 2);
+
+  width: calc(var(--spacing) * 5);
+  height: calc(var(--spacing) * 5);
+
+  background-color: var(--color-gray-100);
+  border: solid 0;
+  border-radius: var(--radius-lg);
+
+  &:hover {
+    @media (hover: hover) {
+      background-color: var(--color-gray-200);
+    }
+  }
+}
+
+.PopoverClose svg {
+  fill: var(--color-gray-500);
+}
+
+.PopoverContent {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  color: var(--color-black);
+
+  background-color: var(--color-white);
+  border-width: 1px;
+  border-color: var(--color-gray-100);
+  border-style: solid;
+  border-radius: var(--radius-lg);
+  /* See: https://www.joshwcomeau.com/css/designing-shadows/ */
+  box-shadow:
+    0 1px 1px hsl(0deg 0% 0% / 0.075),
+    0 2px 2px hsl(0deg 0% 0% / 0.075),
+    0 4px 4px hsl(0deg 0% 0% / 0.075),
+    0 8px 8px hsl(0deg 0% 0% / 0.075),
+    0 16px 16px hsl(0deg 0% 0% / 0.075);
+  padding: calc(var(--spacing) * 4);
+
+  z-index: 9999;
+
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+.PopoverContent[data-state="open"][data-side="top"] {
+  animation-name: slideDownAndFade;
+}
+
+.PopoverContent[data-state="open"][data-side="right"] {
+  animation-name: slideLeftAndFade;
+}
+
+.PopoverContent[data-state="open"][data-side="bottom"] {
+  animation-name: slideUpAndFade;
+}
+
+.PopoverContent[data-state="open"][data-side="left"] {
+  animation-name: slideRightAndFade;
+}
+
+@keyframes slideUpAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideRightAndFade {
+  from {
+    opacity: 0;
+    transform: translateX(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideDownAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideLeftAndFade {
+  from {
+    opacity: 0;
+    transform: translateX(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.PopoverTrigger {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  width: calc(var(--spacing) * 6);
+  height: calc(var(--spacing) * 6);
+
+  position: absolute;
+  top: calc(var(--spacing) * 6);
+  right: calc(var(--spacing) * 6);
+
+  background-color: var(--color-gray-100);
+  border: solid 0;
+  border-radius: var(--radius-lg);
+
+  isolation: isolate;
+  z-index: 9999;
+
+  &:hover {
+    @media (hover: hover) {
+      background-color: var(--color-gray-200);
+    }
+  }
+}

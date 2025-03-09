@@ -1,0 +1,31 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
+{
+  "name": "Bun",
+  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  "build": {
+    // See: https://stackoverflow.com/a/78621662
+    "args": {
+      "REMOTE_USER": "${localEnv:USER}",
+      "REMOTE_UID": "${localEnv:REMOTE_UID:1111}",
+      "REMOTE_GID": "${localEnv:REMOTE_GID:1111}"
+    },
+    "dockerfile": "./Dockerfile"
+  },
+  "remoteUser": "${localEnv:USER}",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "version": "2.5.2"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "esbenp.prettier-vscode",
+        "styled-components.vscode-styled-components",
+        "github.vscode-github-actions"
+      ]
+    }
+  }
+}

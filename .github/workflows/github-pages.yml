@@ -1,0 +1,64 @@
+name: "GitHub Pages"
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: "read"
+  pages: "write"
+  id-token: "write"
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: "github-pages"
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "GitHub: Checkout Repository"
+        uses: "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683"
+
+      - name: "GitHub: Setup Bun"
+        uses: "oven-sh/setup-bun@4bc047ad259df6fc24a6c9b0f9a0cb08cf17fbe5"
+        with:
+          bun-version: "1.2.4"
+
+      - name: "GitHub Pages: Setup GitHub Pages"
+        uses: "actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b"
+
+      - name: "Bun: Install Dependencies"
+        shell: "bash"
+        run: |
+          bun install
+
+      - name: "Bun: Build Artifact"
+        shell: "bash"
+        run: |
+          bun run build
+        env:
+          DEPLOYMENT_URL: https://${{ github.event.repository.owner.name }}.github.io/${{ github.event.repository.name }}
+
+      - name: "Bookmarklet: Remove Comments"
+        shell: "bash"
+        run: |
+          sed -i '/^[[:space:]]*\/\/ /d;' "./dist/bookmarklet.js"
+
+      - name: "Bookmarklet: Add 'javascript:' Prefix"
+        shell: "bash"
+        run: |
+          echo -e "javascript:$(cat ./dist/bookmarklet.js)" > ./dist/bookmarklet.js
+
+      - name: "GitHub Pages: Upload Artifact"
+        uses: "actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa"
+        with:
+          path: "${{ github.workspace }}/dist/"
+
+      - name: "GitHub Pages: Deploy to GitHub Pages"
+        id: "deployment"
+        uses: "actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e"
