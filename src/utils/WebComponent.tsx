@@ -15,6 +15,8 @@ export class WebComponent {
       }
     };
 
-    customElements.define(name, ReactWebComponent);
+    if (!customElements.get(name)) {
+      customElements.define(name, ReactWebComponent);
+    }
   }
 }
