@@ -23,7 +23,6 @@
       "extensions": [
         "ms-azuretools.vscode-docker",
         "esbenp.prettier-vscode",
-        "styled-components.vscode-styled-components",
         "github.vscode-github-actions"
       ]
     }
