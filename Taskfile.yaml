@@ -1,0 +1,132 @@
+version: "3"
+
+dotenv:
+  - ".env"
+
+tasks:
+  default:
+    desc: "Run default task"
+    cmds:
+      - task: "build"
+
+  init:
+    desc: "Initialize project"
+    cmds:
+      - task: "env:init"
+
+  env:init:
+    desc: "Initialize environment variables"
+    cmds:
+      - |
+        cat <<EOF > .env
+        DEPLOYMENT_URL="{{ .DEPLOYMENT_URL }}"
+
+        FTP_HOST="{{ .FTP_HOST }}"
+        FTP_USER="{{ .FTP_USER }}"
+        FTP_PASSWORD="{{ .FTP_PASSWORD }}"
+        EOF
+    vars:
+      DEPLOYMENT_URL: "http://localhost:3000/dist"
+    requires:
+      vars:
+        - "DEPLOYMENT_URL"
+        - "FTP_HOST"
+        - "FTP_USER"
+        - "FTP_PASSWORD"
+
+  install:
+    desc: "Install dependencies"
+    cmds:
+      - task: "pnpm:install"
+
+  pnpm:install:
+    desc: "Install dependencies with pnpm"
+    sources:
+      - "package.json"
+    generates:
+      - "node_modules/"
+      - "pnpm-lock.yaml"
+    cmds:
+      - "pnpm install"
+
+  dev:
+    desc: "Start development server"
+    cmds:
+      - task: "pnpm:dev"
+
+  pnpm:dev:
+    desc: "Start development server with pnpm"
+    deps:
+      - task: "install"
+      - task: "build"
+    cmds:
+      - "pnpm run dev"
+
+  build:
+    desc: "Build project"
+    cmds:
+      - task: "pnpm:build"
+
+  pnpm:build:
+    desc: "Build project with pnpm"
+    deps:
+      - task: "install"
+      - task: "clean"
+    requires:
+      vars:
+        - "DEPLOYMENT_URL"
+    cmds:
+      - "pnpm run build"
+      - "cp examples/index.html out/index.html"
+      - "sed -i '/^[[:space:]]*\\/\\/ /d;' out/dist/bookmarklet.js"
+      - "sed -i '1s/^/javascript:/' out/dist/bookmarklet.js"
+
+  deploy:
+    desc: "Deploy project"
+    cmds:
+      - task: "ftps:deploy"
+
+  ftps:deploy:
+    desc: "Deploy project with FTPS"
+    deps:
+      - task: "build"
+    cmds:
+      - >-
+        rclone copy out/ :ftp:/ \
+          --ftp-host=${FTP_HOST} \
+          --ftp-user=${FTP_USER} \
+          --ftp-pass=$(rclone obscure ${FTP_PASSWORD}) \
+          --ftp-explicit-tls=true
+    requires:
+      vars:
+        - "FTP_HOST"
+        - "FTP_USER"
+        - "FTP_PASSWORD"
+
+  format:
+    desc: "Format project"
+    deps:
+      - task: "pnpm:format"
+      - task: "nix:format"
+
+  pnpm:format:
+    desc: "Format project with pnpm"
+    deps:
+      - task: "install"
+    cmds:
+      - "pnpm run format"
+
+  nix:format:
+    desc: "Format project with Nix"
+    cmds:
+      - "nix fmt"
+
+  clean:
+    desc: "Clean project artifacts"
+    cmds:
+      - task: "pnpm:clean"
+
+  pnpm:clean:
+    desc: "Clean 'out/' directory"
+    cmds:
+      - "rm --recursive --force out"

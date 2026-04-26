@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bookmarklet Demo</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css"
+      integrity="sha384-DCY3M8xLkMu6c9IKcKbe+jHKMjelnwC0p+SBaxfHxoBYZWdJF2X400UdBCgATtAB"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <section class="section">
+      <div class="container is-max-desktop">
+        <div class="box">
+          <h1 class="title">Bookmarklet Demo</h1>
+          <p class="subtitle">React + Radix UI (Shadow DOM)</p>
+
+          <div class="content">
+            <p>
+              This bookmarklet uses <strong>Shadow DOM</strong> for style
+              isolation. The host page uses
+              <a href="https://bulma.io/">Bulma</a>, but the bookmarklet remains
+              unaffected.
+            </p>
+          </div>
+
+          <button class="button is-primary is-large is-fullwidth">
+            Run Bookmarklet
+          </button>
+
+          <p class="is-size-7 has-text-centered mt-4">
+            To install, copy the code from here:
+            <a href="/dist/bookmarklet.js">Bookmarklet</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <script type="module">
+      import { BookmarkletRenderer } from "/dist/index.js";
+
+      const bookmarkletRenderer = new BookmarkletRenderer();
+
+      document.querySelector("button").addEventListener("click", () => {
+        bookmarkletRenderer.render();
+      });
+    </script>
+  </body>
+</html>

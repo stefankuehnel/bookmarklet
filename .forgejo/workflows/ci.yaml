@@ -1,0 +1,31 @@
+name: "CI"
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  nix:
+    runs-on: "codeberg-small"
+    container:
+      image: "docker.io/nixos/nix@sha256:b9c9611c8530fa8049a1215b20638536e1e71dcaf85212e47845112caf3adeea" # v2.34.0
+      env:
+        NIX_CONFIG: "experimental-features = nix-command flakes"
+
+    steps:
+      - name: "Git: Checkout Repository"
+        run: |
+          git init --quiet --initial-branch "main"
+          git remote add origin "${{ forgejo.server_url }}/${{ forgejo.repository }}"
+          git -c http.extraheader="Authorization: token ${{ forgejo.token }}" \
+            fetch --quiet --no-tags --depth=1 origin "${{ forgejo.ref }}"
+          git checkout --quiet "${{ forgejo.sha }}"
+      - name: "Task: Deploy"
+        shell: "nix develop .#ciEnvironment -c bash -e {0}"
+        run: "task deploy"
+        env:
+          DEPLOYMENT_URL: "${{ vars.DEPLOYMENT_URL }}"
+
+          FTP_HOST: "${{ vars.FTP_HOST }}"
+          FTP_USER: "${{ secrets.FTP_USER }}"
+          FTP_PASSWORD: "${{ secrets.FTP_PASSWORD }}"
